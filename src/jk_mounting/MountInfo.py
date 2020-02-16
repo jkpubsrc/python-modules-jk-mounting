@@ -15,12 +15,45 @@ class MountInfo(object):
 		self.__options = options
 	#
 
+	def __eq__(self, other):
+		if isinstance(other, MountInfo):
+			return self.__mountPoint == other.__mountPoint
+		elif isinstance(other, str):
+			return self.__mountPoint == other
+		else:
+			raise TypeError()
+	#
+
+	def __ne__(self, other):
+		if isinstance(other, MountInfo):
+			return self.__mountPoint != other.__mountPoint
+		elif isinstance(other, str):
+			return self.__mountPoint != other
+		else:
+			raise TypeError()
+	#
+
 	#
 	# Is this a regular device like "/dev/sda1" or "/dev/nvme0n1p3" or is this something like "proc" or "udev"?
 	#
 	@property
 	def isRegularDevice(self) -> bool:
-		return self.__device.startswith("/")
+		return self.__device.startswith("/") and not self.__mountPoint.startswith("/snap/")
+	#
+
+	@property
+	def isSnapDevice(self) -> bool:
+		return self.__mountPoint.startswith("/snap/")
+	#
+
+	@property
+	def isNetworkDevice(self) -> bool:
+		return self.__device.find(":/") > 0
+	#
+
+	@property
+	def isReadOnly(self) -> bool:
+		return "ro" in self.__options
 	#
 
 	#
@@ -61,7 +94,22 @@ class MountInfo(object):
 			"mountPoint": self.__mountPoint,
 			"fsType": self.__fsType,
 			"options": self.__options,
+			"isRegularDevice": self.isRegularDevice,
+			"isNetworkDevice": self.isNetworkDevice,
 		}
+	#
+
+	def dump(self, prefix:str = ""):
+		if prefix is None:
+			prefix = ""
+		print(prefix + "MountInfo(")
+		print(prefix + "\tdevice:", self.__device)
+		print(prefix + "\tmountPoint:", self.__mountPoint)
+		print(prefix + "\tfsType:", self.__fsType)
+		print(prefix + "\toptions:", self.__options)
+		print(prefix + "\tisRegularDevice:", self.isRegularDevice)
+		print(prefix + "\tisNetworkDevice:", self.isNetworkDevice)
+		print(")")
 	#
 
 	#
@@ -70,6 +118,8 @@ class MountInfo(object):
 	@staticmethod
 	def _parseFromMountLine(line):
 		assert isinstance(line, str)
+
+		# print(":: " + line)
 
 		elements = line.split(' ')
 		while len(elements) > 6:
@@ -82,15 +132,35 @@ class MountInfo(object):
 				options[optionLine] = None
 			else:
 				options[optionLine[0:pos]] = optionLine[pos + 1:]
+
+		# print("=>", (elements[0], elements[1], elements[2], options))
+
 		return MountInfo(elements[0], elements[1], elements[2], options)
 	#
 
 	def __str__(self):
-		return "MountInfo(device=" + self.__device + ", mountPoint=" + self.__mountPoint + ", fsType=" + self.__fsType + ", options=" + str(self.__options) + ")"
+		s = [
+			"MountInfo(device=",
+			self.__device,
+			", mountPoint=",
+			self.__mountPoint,
+			", fsType=",
+			self.__fsType,
+		]
+		if self.isRegularDevice:
+			s.append(", isRegularDevice")
+		if self.isNetworkDevice:
+			s.append(", isNetworkDevice")
+		if self.isSnapDevice:
+			s.append(", isSnapDevice")
+		if self.isReadOnly:
+			s.append(", isReadOnly")
+		s.append(")")
+		return "".join(s)
 	#
 
 	def __repr__(self):
-		return "MountInfo(device=" + self.__device + ", mountPoint=" + self.__mountPoint + ", fsType=" + self.__fsType + ", options=" + str(self.__options) + ")"
+		return self.__str__()
 	#
 
 #

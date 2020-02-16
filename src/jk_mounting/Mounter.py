@@ -34,8 +34,8 @@ class Mounter(object):
 		self.__mountInfos = self.__retrieveMountInfos()
 	#
 
-	def getMountInfos(self, fsTypeIncl = None, fsTypeExcl = None, isRegularDevice = None):
-		if (fsTypeIncl is None) and (fsTypeExcl is None) and (isRegularDevice is None):
+	def getMountInfos(self, fsTypeIncl = None, fsTypeExcl = None, isRegularDevice:bool = None) -> list:
+		if (fsTypeIncl is None) and (fsTypeExcl is None) and (not isRegularDevice):
 			return list(self.__mountInfos)
 
 		if isRegularDevice is None:
@@ -82,6 +82,134 @@ class Mounter(object):
 					continue
 			ret.append(mi)
 		return ret
+	#
+
+	def getMountInfos2(self, fsTypeIncl = None, fsTypeExcl = None, isRegularDevice:bool = None, isNetworkDevice:bool = None) -> list:
+		if (fsTypeIncl is None) and (fsTypeExcl is None) and (not isRegularDevice) and (not isNetworkDevice):
+			return list(self.__mountInfos)
+
+		# verify arguments
+
+		if isRegularDevice is not None:
+			if not isinstance(isRegularDevice, bool):
+				raise Exception("isRegularDevice is not of type boolean!")
+
+		if isNetworkDevice is not None:
+			if not isinstance(isNetworkDevice, bool):
+				raise Exception("isNetworkDevice is not of type boolean!")
+
+		if fsTypeIncl is not None:
+			if isinstance(fsTypeIncl, str):
+				fsTypeIncl = [ fsTypeIncl ]
+			elif isinstance(fsTypeIncl, list):
+				for fsTypeInclItem in fsTypeIncl:
+					assert isinstance(fsTypeInclItem, str)
+			else:
+				raise Exception("fsTypeIncl is not of type string or string list!")
+
+		if fsTypeExcl is not None:
+			if isinstance(fsTypeExcl, str):
+				fsTypeExcl = [ fsTypeExcl ]
+			elif isinstance(fsTypeExcl, list):
+				for fsTypeExclItem in fsTypeExcl:
+					assert isinstance(fsTypeExclItem, str)
+			else:
+				raise Exception("fsTypeExcl is not of type string or string list!")
+
+		# ----
+
+		ret = []
+		for mi in self.__mountInfos:
+			bRejectAccept = [ False, False ]	# reject, accept
+
+			if isRegularDevice is not None:
+				if isRegularDevice and mi.isRegularDevice:
+					bRejectAccept[1] = True
+
+			if isNetworkDevice is not None:
+				if isNetworkDevice and mi.isNetworkDevice:
+					bRejectAccept[1] = True
+
+			if fsTypeExcl is not None:
+				if mi.fsType in fsTypeExcl:
+					bRejectAccept[1] = True
+
+			if fsTypeIncl is not None:
+				if mi.fsType not in fsTypeIncl:
+					bRejectAccept[1] = True
+
+			if bRejectAccept[0]:
+				continue
+
+			if bRejectAccept[1]:
+				ret.append(mi)
+
+		return ret
+	#
+
+	#
+	# Identifies the mount point a file or directory resides on.
+	#
+	def getMountInfoByFilePath(self, somePath:str, raiseException:bool = False) -> MountInfo:
+		assert isinstance(somePath, str)
+		assert isinstance(raiseException, bool)
+
+		somePath = os.path.realpath(os.path.abspath(somePath))
+
+		mountPointPaths = []
+		devMap = {}
+		for mi in self.getMountInfos(isRegularDevice=True):
+			assert isinstance(mi, MountInfo)
+			devMap[mi.mountPoint] = mi
+			mountPointPaths.append(mi.mountPoint)
+
+		mountPointPaths = sorted(mountPointPaths, reverse=True)
+		for p in mountPointPaths:
+			if p == somePath:
+				return devMap[p]
+		for p in mountPointPaths:
+			p2 = (p + "/") if (len(p) > 1) else p
+			if somePath.startswith(p2):
+				return devMap[p]
+
+		if raiseException:
+			raise Exception("No file system for: " + repr(somePath))
+		else:
+			return None
+	#
+
+	#
+	# Identifies the mount point a file or directory resides on.
+	#
+	def getMountInfoByMountPoint(self, mountPointPath:str, raiseException:bool = False) -> MountInfo:
+		assert isinstance(mountPointPath, str)
+		assert os.path.isabs(mountPointPath)
+		assert isinstance(raiseException, bool)
+
+		mountPointPaths = []
+		devMap = {}
+		for mi in self.getMountInfos(isRegularDevice=True):		# TODO: improve performance by removing duplicate loop
+			assert isinstance(mi, MountInfo)
+			devMap[mi.mountPoint] = mi
+			mountPointPaths.append(mi.mountPoint)
+
+		mountPointPaths = sorted(mountPointPaths, reverse=True)
+		for p in mountPointPaths:
+			if p == mountPointPath:
+				return devMap[p]
+
+		if raiseException:
+			raise Exception("No file system for: " + repr(mountPointPath))
+		else:
+			return None
+	#
+
+	def dump(self, prefix:str = ""):
+		if prefix is None:
+			prefix = ""
+		print("mount infos:")
+		for m in self.__mountInfos:
+			m.dump(prefix + "\t")
 	#
 
 	def isMounted(self, path):
