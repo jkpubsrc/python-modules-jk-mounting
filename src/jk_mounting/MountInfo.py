@@ -47,8 +47,26 @@ class MountInfo(object):
 	#
 
 	@property
+	def isSysOSDevice(self) -> bool:
+		return self.__mountPoint.startswith("/proc/") \
+			or self.__mountPoint.startswith("/sys/") \
+			or self.__mountPoint.startswith("/snap/") \
+			or self.__mountPoint.startswith("/run/") \
+			or self.__mountPoint.startswith("/dev/") \
+			or (self.__mountPoint == "/dev") \
+			or (self.__mountPoint == "/proc") \
+			or (self.__mountPoint == "/sys") \
+			or (self.__mountPoint == "/run")
+	#
+
+	@property
 	def isNetworkDevice(self) -> bool:
 		return self.__device.find(":/") > 0
+	#
+
+	@property
+	def isMTPDevice(self) -> bool:
+		return self.__device == "jmtpfs"
 	#
 
 	@property

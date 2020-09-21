@@ -84,9 +84,9 @@ class Mounter(object):
 		return ret
 	#
 
-	def getMountInfos2(self, fsTypeIncl = None, fsTypeExcl = None, isRegularDevice:bool = None, isNetworkDevice:bool = None) -> list:
-		if (fsTypeIncl is None) and (fsTypeExcl is None) and (not isRegularDevice) and (not isNetworkDevice):
-			return list(self.__mountInfos)
+	def getMountInfos2(self, fsTypeIncl = None, fsTypeExcl = None, isRegularDevice:bool = None, isNetworkDevice:bool = None, isSnapDevice:bool = False, isSysOSDevice:bool = False) -> list:
+		#if (fsTypeIncl is None) and (fsTypeExcl is None) and (isRegularDevice is None) and (isNetworkDevice is None) and (isSnapDevice is None) and (isSysOSDevice is None):
+		#	return list(self.__mountInfos)
 
 		# verify arguments
 
@@ -97,6 +97,14 @@ class Mounter(object):
 		if isNetworkDevice is not None:
 			if not isinstance(isNetworkDevice, bool):
 				raise Exception("isNetworkDevice is not of type boolean!")
+
+		if isSnapDevice is not None:
+			if not isinstance(isSnapDevice, bool):
+				raise Exception("isSnapDevice is not of type boolean!")
+
+		if isSysOSDevice is not None:
+			if not isinstance(isSysOSDevice, bool):
+				raise Exception("isSnapDevice is not of type boolean!")
 
 		if fsTypeIncl is not None:
 			if isinstance(fsTypeIncl, str):
@@ -120,29 +128,41 @@ class Mounter(object):
 
 		ret = []
 		for mi in self.__mountInfos:
-			bRejectAccept = [ False, False ]	# reject, accept
+			bRejectAccept = [ None, None, None, True ]
 
 			if isRegularDevice is not None:
-				if isRegularDevice and mi.isRegularDevice:
-					bRejectAccept[1] = True
+				if mi.isRegularDevice:
+					bRejectAccept[1] = isRegularDevice
 
 			if isNetworkDevice is not None:
-				if isNetworkDevice and mi.isNetworkDevice:
-					bRejectAccept[1] = True
+				if mi.isNetworkDevice:
+					bRejectAccept[1] = isNetworkDevice
+
+			if isSnapDevice is not None:
+				if mi.isSnapDevice:
+					bRejectAccept[1] = isSnapDevice
+
+			if isSysOSDevice is not None:
+				if mi.isSysOSDevice:
+					bRejectAccept[1] = isSysOSDevice
 
 			if fsTypeExcl is not None:
 				if mi.fsType in fsTypeExcl:
-					bRejectAccept[1] = True
+					bRejectAccept[0] = False
 
 			if fsTypeIncl is not None:
 				if mi.fsType not in fsTypeIncl:
-					bRejectAccept[1] = True
+					bRejectAccept[2] = True
 
-			if bRejectAccept[0]:
-				continue
+			# print(mi.mountPoint, mi.device, bRejectAccept)
 
-			if bRejectAccept[1]:
-				ret.append(mi)
+			# process flags
+			for b in bRejectAccept:
+				if b is True:
+					ret.append(mi)
+					break
+				elif b is False:
+					break
 
 		return ret
 	#

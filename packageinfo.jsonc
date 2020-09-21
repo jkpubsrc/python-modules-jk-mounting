@@ -1,0 +1,57 @@
+{
+	"documentation": [],
+	"magic": {
+		"magic": "packageinfo",
+		"version": 2
+	},
+	"meta": {
+		"authors": [
+			{
+				"email": "pubsrc@binary-overflow.de",
+				"name": "J\u00fcrgen Knauth"
+			}
+		],
+		"description": "This python module provides support for retrieving mount information and assists in mounting and unmounting.",
+		"development_status": "stable",
+		"keywords": [
+			"mount",
+			"mounting",
+			"umount",
+			"fstype"
+		],
+		"language": "python3",
+		"license": "Apache2",
+		"name": "jk_mounting",
+		"packageClass": "python-module",
+		"version": "0.2020.9.21"
+	},
+	"repositories": [
+		{
+			"devon_publish": false,
+			"project": "python-module-jk-mounting",
+			"type": "github",
+			"user": "jkpubsrc"
+		},
+		{
+			"devon_publish": false,
+			"project": "jk_mounting",
+			"type": "pypy"
+		}
+	],
+	"requirements": {
+		"python_packages": [
+			"jk_simpleexec"
+		],
+		"python_packages_dev": [],
+		"system_apt_packages": []
+	},
+	"source": {
+		"extra_binary_files": [
+			"bin/mount.py"
+		],
+		"extra_data_files": [],
+		"packages": [
+			"jk_mounting"
+		]
+	}
+}
