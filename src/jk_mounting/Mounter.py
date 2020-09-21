@@ -178,7 +178,7 @@ class Mounter(object):
 
 		mountPointPaths = []
 		devMap = {}
-		for mi in self.getMountInfos(isRegularDevice=True):
+		for mi in self.getMountInfos():
 			assert isinstance(mi, MountInfo)
 			devMap[mi.mountPoint] = mi
 			mountPointPaths.append(mi.mountPoint)
@@ -208,7 +208,7 @@ class Mounter(object):
 
 		mountPointPaths = []
 		devMap = {}
-		for mi in self.getMountInfos(isRegularDevice=True):		# TODO: improve performance by removing duplicate loop
+		for mi in self.getMountInfos():		# TODO: improve performance by removing duplicate loop
 			assert isinstance(mi, MountInfo)
 			devMap[mi.mountPoint] = mi
 			mountPointPaths.append(mi.mountPoint)
@@ -220,6 +220,39 @@ class Mounter(object):
 
 		if raiseException:
 			raise Exception("No file system for: " + repr(mountPointPath))
+		else:
+			return None
+	#
+
+	#
+	# Identifies the mount point a file or directory resides on.
+	#
+	def getMountInfo(self, device:str = None, fsType:str = None, mountPoint:str = None, raiseException:bool = False) -> MountInfo:
+		if device is not None:
+			assert isinstance(device, str)
+		if fsType is not None:
+			assert isinstance(fsType, str)
+		if mountPoint is not None:
+			assert isinstance(mountPoint, str)
+		if (mountPoint is None) and (device is None) and (fsType is None):
+			raise Exception("No filter specified!")
+		assert isinstance(raiseException, bool)
+
+		for mi in self.getMountInfos():		# TODO: improve performance by removing duplicate loop
+			#print("x", repr(mi.mountPoint), repr(mi.device), repr(device))
+			bAccept = True
+			if device is not None:
+				if (device is not None) and (mi.device != device):
+					bAccept = False
+				elif (fsType is not None) and (mi.fsType != fsType):
+					bAccept = False
+				elif (mountPoint is not None) and (mi.mountPoint != mountPoint):
+					bAccept = False
+			if bAccept:
+				return mi
+
+		if raiseException:
+			raise Exception("No mount entry found.")
 		else:
 			return None
 	#
@@ -327,7 +360,7 @@ class Mounter(object):
 		return True
 	#
 
-	def unmount(self, deviceOrMountPoint:str, raiseExceptionIfNotMounted = True):
+	def unmount(self, deviceOrMountPoint:str, raiseExceptionIfNotMounted = True) -> bool:
 		assert isinstance(deviceOrMountPoint, str)
 		assert isinstance(raiseExceptionIfNotMounted, bool)
 
@@ -336,6 +369,29 @@ class Mounter(object):
 				raise Exception(deviceOrMountPoint + " is not mounted!")
 
 		result = jk_simpleexec.invokeCmd("/bin/umount", [ deviceOrMountPoint ])
+		if len(result.stdErrLines) > 0:
+			for s in result.stdErrLines:
+				if s.find(": WARNING:") >= 0:
+					continue
+				else:
+					raise Exception(s)
+		if result.returnCode != 0:
+			raise Exception("Failed to unmount " + deviceOrMountPoint + "!")
+		return True
+	#
+
+	def userUMount(self, deviceOrMountPoint:str, raiseExceptionIfNotMounted = True) -> bool:
+		assert isinstance(deviceOrMountPoint, str)
+		assert isinstance(raiseExceptionIfNotMounted, bool)
+
+		if not os.path.isfile("/bin/fusermount"):
+			raise Exception("Not installed: fusermount")
+
+		if not self.isMounted(deviceOrMountPoint):
+			if raiseExceptionIfNotMounted:
+				raise Exception(deviceOrMountPoint + " is not mounted!")
+
+		result = jk_simpleexec.invokeCmd("/bin/fusermount", [ "-u", deviceOrMountPoint ])
 		if len(result.stdErrLines) > 0:
 			for s in result.stdErrLines:
 				if s.find(": WARNING:") >= 0:
