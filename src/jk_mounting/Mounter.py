@@ -24,10 +24,35 @@ from .MountOptions import MountOptions
 
 class Mounter(object):
 
+	################################################################################################################################
+	## Constructor Methods
+	################################################################################################################################
+
 	def __init__(self):
 		self.__lastRefresh = 0
 		self.refresh()
 	#
+
+	################################################################################################################################
+	## Public Properties
+	################################################################################################################################
+
+	################################################################################################################################
+	## Helper Methods
+	################################################################################################################################
+
+	def __retrieveMountInfos(self):
+		mountInfos = []
+		with codecs.open("/proc/mounts", "r", "utf-8") as f:
+			for line in f.readlines():
+				line = line[:-1]
+				mountInfos.append(MountInfo._parseFromMountLine(line))
+		return mountInfos
+	#
+
+	################################################################################################################################
+	## Public Methods
+	################################################################################################################################
 
 	def refresh(self):
 		# dt = time.time() - self.__lastRefresh
@@ -272,15 +297,6 @@ class Mounter(object):
 			if mi.mountPoint == path:
 				return True
 		return False
-	#
-
-	def __retrieveMountInfos(self):
-		mountInfos = []
-		with codecs.open("/proc/mounts", "r", "utf-8") as f:
-			for line in f.readlines():
-				line = line[:-1]
-				mountInfos.append(MountInfo._parseFromMountLine(line))
-		return mountInfos
 	#
 
 	#

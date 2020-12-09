@@ -14,6 +14,10 @@
 #
 class MountOptions(object):
 
+	################################################################################################################################
+	## Constructor Methods
+	################################################################################################################################
+
 	def __init__(self):
 		self._async = True
 		self._atime = True
@@ -41,43 +45,11 @@ class MountOptions(object):
 		self._dir_mode = None
 		self._domain = None
 		"""
-
-	def __repr__(self):
-		return "MountOptions(" + self.__str__() + ")"
-
-	def __str__(self):
-		s = ""
-
-		if self._uid is not None:
-			s += ",uid=" + str(self._uid)
-		if self._gid is not None:
-			s += ",gid=" + str(self._gid)
-		if self._remount:
-			s += ",remount"
-		if not self._async:
-			s += ",sync"
-		if not self._atime:
-			s += ",noatime"
-		if not self._diratime:
-			s += ",nodiratime"
-		if not self._rw:
-			s += ",ro"
-		if not self._dev:
-			s += ",nondev"
-		if not self._suid:
-			s += ",nosuid"
-		if not self._exec:
-			s += ",noexec"
-		if not self._relatime:
-			s += ",norelatime"
-		if self._dirsync:
-			s += ",dirsync"
-
-		if len(s) > 0:
-			return s[1:]
-		else:
-			return ""
 	#
+
+	################################################################################################################################
+	## Public Properties
+	################################################################################################################################
 
 	#
 	# Attempt to remount an already-mounted filesystem. This is commonly used to change the mount flags for a filesystem, especially to make a readonly filesystem writeable. It does not change device or mount point.
@@ -390,6 +362,52 @@ class MountOptions(object):
 		assert isinstance(value, (type(None), str))
 		self._domain = value
 	"""
+
+	################################################################################################################################
+	## Helper Methods
+	################################################################################################################################
+
+	################################################################################################################################
+	## Public Methods
+	################################################################################################################################
+
+	def __repr__(self):
+		return "MountOptions(" + self.__str__() + ")"
+	#
+
+	def __str__(self):
+		s = ""
+
+		if self._uid is not None:
+			s += ",uid=" + str(self._uid)
+		if self._gid is not None:
+			s += ",gid=" + str(self._gid)
+		if self._remount:
+			s += ",remount"
+		if not self._async:
+			s += ",sync"
+		if not self._atime:
+			s += ",noatime"
+		if not self._diratime:
+			s += ",nodiratime"
+		if not self._rw:
+			s += ",ro"
+		if not self._dev:
+			s += ",nondev"
+		if not self._suid:
+			s += ",nosuid"
+		if not self._exec:
+			s += ",noexec"
+		if not self._relatime:
+			s += ",norelatime"
+		if self._dirsync:
+			s += ",dirsync"
+
+		if len(s) > 0:
+			return s[1:]
+		else:
+			return ""
+	#
 
 #
 

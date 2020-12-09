@@ -21,9 +21,9 @@ setup(
 	classifiers = [
 		"Development Status :: 5 - Production/Stable",
 		"License :: OSI Approved :: Apache Software License",
+		"Programming Language :: Python :: 3",
 	],
 	description = "This python module provides support for retrieving mount information and assists in mounting and unmounting.",
-	download_url = "https://github.com/jkpubsrc/python-module-jk-mounting/tarball/0.2020.9.21",
 	include_package_data = False,
 	install_requires = [
 		"jk_simpleexec",
@@ -34,7 +34,7 @@ setup(
 		"umount",
 		"fstype",
 	],
-	license = "Apache 2.0",
+	license = "Apache2",
 	name = "jk_mounting",
 	packages = [
 		"jk_mounting",
@@ -42,8 +42,7 @@ setup(
 	scripts = [
 		"bin/mount.py",
 	],
-	url = "https://github.com/jkpubsrc/python-module-jk-mounting",
-	version = "0.2020.9.21",
+	version = "0.2020.12.9",
 	zip_safe = False,
 	long_description = readme(),
 	long_description_content_type="text/markdown",
