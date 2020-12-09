@@ -3,10 +3,14 @@
 
 
 
+import jk_prettyprintobj
 
 
 
-class MountInfo(object):
+
+
+
+class MountInfo(jk_prettyprintobj.DumpMixin):
 
 	################################################################################################################################
 	## Constructor Methods
@@ -101,6 +105,24 @@ class MountInfo(object):
 	## Helper Methods
 	################################################################################################################################
 
+	def _dumpVarNames(self) -> list:
+		return [
+			"device",
+			"mountPoint",
+			"options",
+			"device",
+			"isRegularDevice",
+			"isNetworkDevice",
+			"isSnapDevice",
+			"isMTPDevice",
+			"isReadOnly",
+		]
+	#
+
+	################################################################################################################################
+	## Public Methods
+	################################################################################################################################
+
 	def __eq__(self, other):
 		if isinstance(other, MountInfo):
 			return self.__mountPoint == other.__mountPoint
@@ -127,20 +149,10 @@ class MountInfo(object):
 			"options": self.__options,
 			"isRegularDevice": self.isRegularDevice,
 			"isNetworkDevice": self.isNetworkDevice,
+			"isSnapDevice": self.isSnapDevice,
+			"isMTPDevice": self.isMTPDevice,
+			"isReadOnly": self.isReadOnly,
 		}
-	#
-
-	def dump(self, prefix:str = ""):
-		if prefix is None:
-			prefix = ""
-		print(prefix + "MountInfo(")
-		print(prefix + "\tdevice:", self.__device)
-		print(prefix + "\tmountPoint:", self.__mountPoint)
-		print(prefix + "\tfsType:", self.__fsType)
-		print(prefix + "\toptions:", self.__options)
-		print(prefix + "\tisRegularDevice:", self.isRegularDevice)
-		print(prefix + "\tisNetworkDevice:", self.isNetworkDevice)
-		print(")")
 	#
 
 	def __str__(self):

@@ -27,6 +27,7 @@ setup(
 	include_package_data = False,
 	install_requires = [
 		"jk_simpleexec",
+		"jk_prettyprintobj",
 	],
 	keywords = [
 		"mount",

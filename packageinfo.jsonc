@@ -40,7 +40,8 @@
 	],
 	"requirements": {
 		"python_packages": [
-			"jk_simpleexec"
+			"jk_simpleexec",
+			"jk_prettyprintobj"
 		],
 		"python_packages_dev": [],
 		"system_apt_packages": []
