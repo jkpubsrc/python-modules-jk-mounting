@@ -10,6 +10,9 @@ import jk_prettyprintobj
 
 
 
+#
+# This class represents information of a mount point as returend by the Linux system tool "mount".
+#
 class MountInfo(jk_prettyprintobj.DumpMixin):
 
 	################################################################################################################################
@@ -69,7 +72,7 @@ class MountInfo(jk_prettyprintobj.DumpMixin):
 	#
 
 	#
-	# The device. This is something like "/dev/sda", "/dev/nvme0n1p3", "proc" or "udev".
+	# The device. This is an absolute path such as "/dev/sda" or "/dev/nvme0n1p3" or some other identifier such as "proc" or "udev".
 	#
 	@property
 	def device(self) -> str:
@@ -178,6 +181,10 @@ class MountInfo(jk_prettyprintobj.DumpMixin):
 
 	def __repr__(self):
 		return self.__str__()
+	#
+
+	def __hash__(self):
+		return self.__mountPoint.__hash__()
 	#
 
 	################################################################################################################################

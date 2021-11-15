@@ -55,227 +55,299 @@ class MountOptions(object):
 	# Attempt to remount an already-mounted filesystem. This is commonly used to change the mount flags for a filesystem, especially to make a readonly filesystem writeable. It does not change device or mount point.
 	#
 	@property
-	def remount(self):
+	def o_remount(self):
 		return self._remount
+	#
 
-	@remount.setter
-	def remount(self, value):
+	@o_remount.setter
+	def o_remount(self, value):
 		assert isinstance(value, bool)
 		self._remount = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Allow set-user-identifier or set-group-identifier bits to take effect.
 	#
 	@property
-	def suid(self):
+	def o_suid(self):
 		return self._suid
+	#
 
-	@suid.setter
-	def suid(self, value):
+	@o_suid.setter
+	def o_suid(self, value):
 		assert isinstance(value, bool)
 		self._suid = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Do not allow set-user-identifier or set-group-identifier bits to take effect. (This seems safe, but is in fact rather unsafe if you have suidperl(1) installed.)
 	#
 	@property
-	def nosuid(self):
+	def o_nosuid(self):
 		return not self._suid
+	#
 
-	@nosuid.setter
-	def nosuid(self, value):
+	@o_nosuid.setter
+	def o_nosuid(self, value):
 		assert isinstance(value, bool)
 		self._suid = not value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Update inode access times relative to modify or change time. Access time is only updated if the previous access time was earlier than the current modify or change time. (Similar to noatime, but doesn't break mutt or other applications that need to know if a file has been read since the last time it was modified.)
 	#
 	@property
-	def relatime(self):
+	def o_relatime(self):
 		return self._relatime
+	#
 
-	@relatime.setter
-	def relatime(self, value):
+	@o_relatime.setter
+	def o_relatime(self, value):
 		assert isinstance(value, bool)
 		self._relatime = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Do not use relatime feature. See also the strictatime mount option.
 	#
 	@property
-	def norelatime(self):
+	def o_norelatime(self):
 		return not self._relatime
+	#
 
-	@norelatime.setter
-	def norelatime(self, value):
+	@o_norelatime.setter
+	def o_norelatime(self, value):
 		assert isinstance(value, bool)
 		self._relatime = not value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# All I/O to the filesystem should be done asynchronously. (See also the sync option.)
 	#
 	@property
-	def async(self):
+	def o_async(self):
 		return self._async
+	#
 
-	@async.setter
-	def async(self, value):
+	@o_async.setter
+	def o_async(self, value):
 		assert isinstance(value, bool)
 		self._async = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# All I/O to the filesystem should be done synchronously. In case of media with limited number of write cycles (e.g. some flash drives) "sync" may cause life-cycle shortening.
 	#
 	@property
-	def sync(self):
+	def o_sync(self):
 		return not self._async
+	#
 
-	@sync.setter
-	def sync(self, value):
+	@o_sync.setter
+	def o_sync(self, value):
 		assert isinstance(value, bool)
 		self._async = not value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Do not update inode access times on this filesystem (e.g, for faster access on the news spool to speed up news servers).
 	#
 	@property
-	def noatime(self):
+	def o_noatime(self):
 		return not self._atime
+	#
 
-	@noatime.setter
-	def noatime(self, value):
+	@o_noatime.setter
+	def o_noatime(self, value):
 		assert isinstance(value, bool)
 		self._atime = not value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Do not use noatime feature, then the inode access time is controlled by kernel defaults. See also the description for strictatime and relatime mount options.
 	#
 	@property
-	def atime(self):
+	def o_atime(self):
 		return self._atime
+	#
 
-	@atime.setter
-	def atime(self, value):
+	@o_atime.setter
+	def o_atime(self, value):
 		assert isinstance(value, bool)
 		self._atime = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Do not interpret character or block special devices on the file system.
 	#
 	@property
-	def nodev(self):
+	def o_nodev(self):
 		return not self._dev
+	#
 
-	@nodev.setter
-	def nodev(self, value):
+	@o_nodev.setter
+	def o_nodev(self, value):
 		assert isinstance(value, bool)
 		self._dev = not value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Interpret character or block special devices on the filesystem.
 	#
 	@property
-	def dev(self):
+	def o_dev(self):
 		return self._dev
+	#
 
-	@dev.setter
-	def dev(self, value):
+	@o_dev.setter
+	def o_dev(self, value):
 		assert isinstance(value, bool)
 		self._dev = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Update directory inode access times on this filesystem. This is the default.
 	#
 	@property
-	def diratime(self):
+	def o_diratime(self):
 		return self._rw
+	#
 
-	@diratime.setter
-	def diratime(self, value):
+	@o_diratime.setter
+	def o_diratime(self, value):
 		assert isinstance(value, bool)
 		self._diratime = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Do not update directory inode access times on this filesystem.
 	#
 	@property
-	def nodiratime(self):
+	def o_nodiratime(self):
 		return not self._diratime
+	#
 
-	@nodiratime.setter
-	def nodiratime(self, value):
+	@o_nodiratime.setter
+	def o_nodiratime(self, value):
 		assert isinstance(value, bool)
 		self._diratime = not value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# All directory updates within the filesystem should be done synchronously. This affects the following system calls: creat, link, unlink, symlink, mkdir, rmdir, mknod and rename.
 	#
 	@property
-	def dirsync(self):
+	def o_dirsync(self):
 		return self._dirsync
+	#
 
-	@dirsync.setter
-	def dirsync(self, value):
+	@o_dirsync.setter
+	def o_dirsync(self, value):
 		assert isinstance(value, bool)
 		self._dirsync = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Permit execution of binaries.
 	#
 	@property
-	def exec(self):
+	def o_exec(self):
 		return self._exec
+	#
 
-	@exec.setter
-	def exec(self, value):
+	@o_exec.setter
+	def o_exec(self, value):
 		assert isinstance(value, bool)
 		self._exec = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Do not allow direct execution of any binaries on the mounted filesystem. (Until recently it was possible to run binaries anyway using a command like /lib/ld*.so /mnt/binary. This trick fails since Linux 2.4.25 / 2.6.0.)
 	#
 	@property
-	def noexec(self):
+	def o_noexec(self):
 		return not self._exec
+	#
 
-	@noexec.setter
-	def noexec(self, value):
+	@o_noexec.setter
+	def o_noexec(self, value):
 		assert isinstance(value, bool)
 		self._exec = not value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Mount the filesystem read-write.
 	#
 	@property
-	def rw(self):
+	def o_rw(self):
 		return self._rw
+	#
 
-	@rw.setter
-	def rw(self, value):
+	@o_rw.setter
+	def o_rw(self, value):
 		assert isinstance(value, bool)
 		self._rw = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Set the owner of all files. (Default: the uid and gid of the current process.)
 	#
 	@property
-	def uid(self):
+	def o_uid(self):
 		return self._uid
+	#
 
-	@uid.setter
-	def uid(self, value):
+	@o_uid.setter
+	def o_uid(self, value):
 		assert isinstance(value, (type(None), int, str))
 		self._uid = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Set the group of all files. (Default: the uid and gid of the current process.)
 	#
 	@property
-	def gid(self):
+	def o_gid(self):
 		return self._gid
 
-	@gid.setter
-	def gid(self, value):
+	@o_gid.setter
+	def o_gid(self, value):
 		assert isinstance(value, (type(None), int, str))
 		self._gid = value
 

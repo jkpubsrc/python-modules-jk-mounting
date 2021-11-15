@@ -301,6 +301,7 @@ class Mounter(object):
 
 	#
 	# Mount a device.
+	# This method internally calls "/bin/mount".
 	#
 	# @param	str device						The device to mount. Specify the device path here.
 	# @param	str mountPoint					The location where to mount the specified device. Specify an existing empty directory here.
@@ -376,6 +377,10 @@ class Mounter(object):
 		return True
 	#
 
+	#
+	# Unmount a device.
+	# This method internally calls "/bin/umount".
+	#
 	def unmount(self, deviceOrMountPoint:str, raiseExceptionIfNotMounted = True) -> bool:
 		assert isinstance(deviceOrMountPoint, str)
 		assert isinstance(raiseExceptionIfNotMounted, bool)
@@ -396,6 +401,10 @@ class Mounter(object):
 		return True
 	#
 
+	#
+	# Unmount a device.
+	# This method internally calls "/bin/fusermount".
+	#
 	def userUMount(self, deviceOrMountPoint:str, raiseExceptionIfNotMounted = True) -> bool:
 		assert isinstance(deviceOrMountPoint, str)
 		assert isinstance(raiseExceptionIfNotMounted, bool)
@@ -418,8 +427,6 @@ class Mounter(object):
 			raise Exception("Failed to unmount " + deviceOrMountPoint + "!")
 		return True
 	#
-
-
 
 #
 

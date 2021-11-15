@@ -43,7 +43,7 @@ setup(
 	scripts = [
 		"bin/mount.py",
 	],
-	version = "0.2021.1.18",
+	version = "0.2021.11.15",
 	zip_safe = False,
 	long_description = readme(),
 	long_description_content_type="text/markdown",
