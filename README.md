@@ -8,7 +8,7 @@ This python module provides support for retrieving mount information and assists
 
 Information about this module can be found here:
 
-* [github.org](https://github.com/jkpubsrc/python-module-jk-mounting)
+* [github.com](https://github.com/jkpubsrc/python-modules-jk-mounting)
 * [pypi.python.org](https://pypi.python.org/pypi/jk_mounting)
 
 How to use this module
