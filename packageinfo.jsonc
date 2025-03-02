@@ -35,7 +35,7 @@
 		{
 			"devon_publish": false,
 			"project": "jk_mounting",
-			"type": "pypy"
+			"type": "pypi"
 		}
 	],
 	"requirements": {
@@ -48,7 +48,7 @@
 	},
 	"source": {
 		"extra_binary_files": [
-			"bin/mount.py"
+			// "bin/mount.py"
 		],
 		"extra_data_files": [],
 		"packages": [
