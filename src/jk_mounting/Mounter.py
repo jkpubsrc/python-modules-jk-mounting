@@ -1,11 +1,9 @@
 
 
 
-
+import typing
 import os
-import sys
 import codecs
-# import time
 
 import jk_simpleexec
 
@@ -29,7 +27,9 @@ class Mounter(object):
 	################################################################################################################################
 
 	def __init__(self):
-		self.__lastRefresh = 0
+		# self.__lastRefresh = 0
+		self.__mountInfos:typing.List[MountInfo] = None
+
 		self.refresh()
 	#
 
@@ -41,7 +41,7 @@ class Mounter(object):
 	## Helper Methods
 	################################################################################################################################
 
-	def __retrieveMountInfos(self):
+	def __retrieveMountInfos(self) -> typing.List[MountInfo]:
 		mountInfos = []
 		with codecs.open("/proc/mounts", "r", "utf-8") as f:
 			for line in f.readlines():
@@ -59,7 +59,7 @@ class Mounter(object):
 		self.__mountInfos = self.__retrieveMountInfos()
 	#
 
-	def getMountInfos(self, fsTypeIncl = None, fsTypeExcl = None, isRegularDevice:bool = None) -> list:
+	def getMountInfos(self, fsTypeIncl = None, fsTypeExcl = None, isRegularDevice:bool = None) -> typing.List[MountInfo]:
 		if (fsTypeIncl is None) and (fsTypeExcl is None) and (not isRegularDevice):
 			return list(self.__mountInfos)
 
@@ -109,7 +109,16 @@ class Mounter(object):
 		return ret
 	#
 
-	def getMountInfos2(self, fsTypeIncl = None, fsTypeExcl = None, isRegularDevice:bool = None, isNetworkDevice:bool = None, isSnapDevice:bool = False, isSysOSDevice:bool = False) -> list:
+	def getMountInfos2(self,
+			fsTypeIncl:typing.Union[str,typing.List[str],typing.Tuple[str],None] = None,
+			fsTypeExcl:typing.Union[str,typing.List[str],typing.Tuple[str],None] = None,
+			isRegularDevice:typing.Union[bool,None] = None,
+			isNetworkDevice:typing.Union[bool,None] = None,
+			isSnapDevice:typing.Union[bool,None] = False,
+			isSysOSDevice:typing.Union[bool,None] = False,
+			isFuseDevice:typing.Union[bool,None] = None,
+		) -> typing.List[MountInfo]:
+
 		#if (fsTypeIncl is None) and (fsTypeExcl is None) and (isRegularDevice is None) and (isNetworkDevice is None) and (isSnapDevice is None) and (isSysOSDevice is None):
 		#	return list(self.__mountInfos)
 
@@ -131,10 +140,14 @@ class Mounter(object):
 			if not isinstance(isSysOSDevice, bool):
 				raise Exception("isSnapDevice is not of type boolean!")
 
+		if isFuseDevice is not None:
+			if not isinstance(isFuseDevice, bool):
+				raise Exception("isFuseDevice is not of type boolean!")
+
 		if fsTypeIncl is not None:
 			if isinstance(fsTypeIncl, str):
 				fsTypeIncl = [ fsTypeIncl ]
-			elif isinstance(fsTypeIncl, list):
+			elif isinstance(fsTypeIncl, (list,tuple)):
 				for fsTypeInclItem in fsTypeIncl:
 					assert isinstance(fsTypeInclItem, str)
 			else:
@@ -143,7 +156,7 @@ class Mounter(object):
 		if fsTypeExcl is not None:
 			if isinstance(fsTypeExcl, str):
 				fsTypeExcl = [ fsTypeExcl ]
-			elif isinstance(fsTypeExcl, list):
+			elif isinstance(fsTypeExcl, (list,tuple)):
 				for fsTypeExclItem in fsTypeExcl:
 					assert isinstance(fsTypeExclItem, str)
 			else:
@@ -171,6 +184,10 @@ class Mounter(object):
 				if mi.isSysOSDevice:
 					bRejectAccept[1] = isSysOSDevice
 
+			if isFuseDevice is not None:
+				if mi.isFuseDevice:
+					bRejectAccept[1] = isFuseDevice
+
 			if fsTypeExcl is not None:
 				if mi.fsType in fsTypeExcl:
 					bRejectAccept[0] = False
@@ -195,7 +212,7 @@ class Mounter(object):
 	#
 	# Identifies the mount point a file or directory resides on.
 	#
-	def getMountInfoByFilePath(self, somePath:str, raiseException:bool = False) -> MountInfo:
+	def getMountInfoByFilePath(self, somePath:str, raiseException:bool = False) -> typing.Union[MountInfo,None]:
 		assert isinstance(somePath, str)
 		assert isinstance(raiseException, bool)
 
@@ -226,7 +243,7 @@ class Mounter(object):
 	#
 	# Identifies the mount point a file or directory resides on.
 	#
-	def getMountInfoByMountPoint(self, mountPointPath:str, raiseException:bool = False) -> MountInfo:
+	def getMountInfoByMountPoint(self, mountPointPath:str, raiseException:bool = False) -> typing.Union[MountInfo,None]:
 		assert isinstance(mountPointPath, str)
 		assert os.path.isabs(mountPointPath)
 		assert isinstance(raiseException, bool)
@@ -252,7 +269,7 @@ class Mounter(object):
 	#
 	# Identifies the mount point a file or directory resides on.
 	#
-	def getMountInfo(self, device:str = None, fsType:str = None, mountPoint:str = None, raiseException:bool = False) -> MountInfo:
+	def getMountInfo(self, device:str = None, fsType:str = None, mountPoint:str = None, raiseException:bool = False) -> typing.Union[MountInfo,None]:
 		if device is not None:
 			assert isinstance(device, str)
 		if fsType is not None:
@@ -314,7 +331,7 @@ class Mounter(object):
 	#											the device in question is already mounted (or the path in question is already used as a
 	#											mount point).
 	#
-	def mount(self, device:str, mountPoint:str, options = None, raiseExceptionIfMounted = True):
+	def mount(self, device:str, mountPoint:str, options = None, raiseExceptionIfMounted = True) -> bool:
 		assert isinstance(device, str)
 		assert isinstance(mountPoint, str)
 		assert isinstance(options, (type(None), str, list, dict, MountOptions))

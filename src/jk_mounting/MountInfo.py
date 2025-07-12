@@ -1,7 +1,6 @@
 
 
-
-
+import typing
 
 import jk_prettyprintobj
 
@@ -9,6 +8,8 @@ import jk_prettyprintobj
 
 
 
+
+MountInfo = typing.NewType("MountInfo", object)
 
 #
 # This class represents information of a mount point as returend by the Linux system tool "mount".
@@ -57,10 +58,21 @@ class MountInfo(jk_prettyprintobj.DumpMixin):
 	#
 
 	@property
-	def isNetworkDevice(self) -> bool:
-		return (self.__device.find(":/") > 0) or self.__fsType.startswith("fuse.")
+	def isFuseDevice(self) -> bool:
+		return self.__fsType.startswith("fuse") and not self.isSysOSDevice
 	#
 
+	#
+	# This kind of detection might not be too reliable.
+	#
+	@property
+	def isNetworkDevice(self) -> bool:
+		return (self.__device.find(":/") > 0) # or self.__fsType.startswith("fuse.")
+	#
+
+	#
+	# This kind of detection might not be too reliable.
+	#
 	@property
 	def isMTPDevice(self) -> bool:
 		return self.__device == "jmtpfs"
@@ -88,7 +100,39 @@ class MountInfo(jk_prettyprintobj.DumpMixin):
 	#
 
 	#
-	# The type of the file system used. This is something like "cgroup", "tmpfs", "proc", "squashfs" or "ext4".
+	# The type of the file system used. Example values:
+	#
+	# * (regular files systems)
+	# 		* vfat
+	# 		* ext4
+	# * (fuse)
+	# 		* fuse
+	# 		* fuse.Locked(fs.rootNode)
+	# 		* fuse.gvfsd-fuse
+	# 		* fuseblk
+	# 		* fusectl
+	# * (other)
+	# 		* autofs
+	# 		* binfmt_misc
+	# 		* bpf
+	# 		* cgroup
+	# 		* cgroup2
+	# 		* configfs
+	# 		* debugfs
+	# 		* devpts
+	# 		* devtmpfs
+	# 		* efivarfs
+	# 		* hugetlbfs
+	# 		* mqueue
+	# 		* nsfs
+	# 		* proc
+	# 		* pstore
+	# 		* rpc_pipefs
+	# 		* securityfs
+	# 		* squashfs
+	# 		* sysfs
+	# 		* tmpfs
+	# 		* tracefs
 	#
 	@property
 	def fsType(self) -> str:
@@ -112,12 +156,14 @@ class MountInfo(jk_prettyprintobj.DumpMixin):
 		return [
 			"device",
 			"mountPoint",
+			"fsType",
 			"options",
 			"device",
 			"isRegularDevice",
 			"isNetworkDevice",
 			"isSnapDevice",
 			"isMTPDevice",
+			"isFuseDevice",
 			"isReadOnly",
 		]
 	#
@@ -154,6 +200,8 @@ class MountInfo(jk_prettyprintobj.DumpMixin):
 			"isNetworkDevice": self.isNetworkDevice,
 			"isSnapDevice": self.isSnapDevice,
 			"isMTPDevice": self.isMTPDevice,
+			"isSysOSDevice": self.isSysOSDevice,
+			"isFuseDevice": self.isFuseDevice,
 			"isReadOnly": self.isReadOnly,
 		}
 	#
@@ -173,6 +221,12 @@ class MountInfo(jk_prettyprintobj.DumpMixin):
 			s.append(", isNetworkDevice")
 		if self.isSnapDevice:
 			s.append(", isSnapDevice")
+		if self.isMTPDevice:
+			s.append(", isMTPDevice")
+		if self.isSysOSDevice:
+			s.append(", isSysOSDevice")
+		if self.isFuseDevice:
+			s.append(", isFuseDevice")
 		if self.isReadOnly:
 			s.append(", isReadOnly")
 		s.append(")")
@@ -195,7 +249,7 @@ class MountInfo(jk_prettyprintobj.DumpMixin):
 	# This method is invoked by `Mounter` to parse a mount information text line.
 	#
 	@staticmethod
-	def _parseFromMountLine(line):
+	def _parseFromMountLine(line) -> MountInfo:
 		assert isinstance(line, str)
 
 		# print(":: " + line)
